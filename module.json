@@ -4,5 +4,8 @@
     "description": "Import instant scenes from One Page Dungeon",
     "author": "Tarkan Al-Kazily",
     "version": "0.1.0",
-    "minimumCoreVersion": "0.7.9"
+    "minimumCoreVersion": "0.7.9",
+    "scripts": [
+        "scripts/hello.js"
+    ]
 }

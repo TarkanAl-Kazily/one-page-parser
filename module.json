@@ -1,0 +1,8 @@
+{
+    "name": "foundry-vtt-one-page-parser",
+    "title": "One Page Parser",
+    "description": "Import instant scenes from One Page Dungeon",
+    "author": "Tarkan Al-Kazily",
+    "version": "0.1.0",
+    "minimumCoreVersion": "0.7.9"
+}

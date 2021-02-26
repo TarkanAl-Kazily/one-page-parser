@@ -1,7 +1,8 @@
 # Stuff to do
 
 [ ] Modify "Create Scene" initial UI:
-  [ ] Add button next to "Create Scene" that says "Import"
+  [X] Add button next to "Create Scene" that says "Import"
+  [ ] Button creates a dialog
   [ ] Import will perform dummy scene creation actions
   [ ] Import must be one-time action, after which normal scene edit UI should work
 
@@ -14,7 +15,8 @@
   [ ] Set the lighting to dynamic
   [ ] Set the default camera view to center the map
 
-[ ] Smart scene import UI
+[ ] Button Dialog UI - extends FormApplication (or SceneConfig or BaseEntitySheet)
+  [ ] Field to give name to scene
   [ ] Button to select import PNG
   [ ] Button to select import JSON
   [ ] Field to set grid pixel size (default 70)

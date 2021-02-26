@@ -11,14 +11,7 @@ Hooks.on("ready", function() {
 
 Hooks.on(
 "renderScenesDirectory",
-(app: JournalSheet, html: JQuery<HTMLElement>, data) => {
-  if (
-    !window.oneJournal.userPermitted() ||
-    html.closest("#OneJournalDirectory").length != 0
-  ) {
-    return;
-  }
-
+(app, html, data) => {
   window.oneJournal.openButton = $(
     `<button class="one-journal-open">${i18n("OpenButton")}</button>`
   );

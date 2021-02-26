@@ -4,7 +4,7 @@ Hooks.once("init", function() {
     console.log("This code runs once the Foundry VTT software begins it's initialization workflow.");
 
     Hooks.on(
-        "renderScenesDirectory",
+        "renderSceneDirectory",
         (app, html, data) => {
             console.log("TARKANAKNA Hook on renderScenesDirectory");
 

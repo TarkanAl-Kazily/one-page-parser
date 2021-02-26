@@ -25,6 +25,16 @@ Hooks.once("init", function() {
 
         }
     );
+
+    Hooks.on(
+        "renderDialog",
+        (app, html, data) => {
+            console.log("TARKANAKNA Hook on renderDialog");
+            console.log(app);
+            console.log(html);
+            console.log(data);
+        }
+    );
 });
 
 Hooks.on("ready", function() {

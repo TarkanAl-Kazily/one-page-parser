@@ -7,3 +7,7 @@ Hooks.on("init", function() {
 Hooks.on("ready", function() {
   console.log("This code runs once core initialization is ready and game data is available.");
 });
+
+Hooks.on("Create Scene", function() {
+  console.log("Create Scene hook ran WOOTOOOTOTOTO!!!");
+});

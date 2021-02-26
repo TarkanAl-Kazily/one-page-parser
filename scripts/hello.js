@@ -1,12 +1,12 @@
 console.log("Hello World! This code runs immediately when the file is loaded.");
 
-Hooks.on("init", async function() {
+Hooks.once("init", function() {
     console.log("This code runs once the Foundry VTT software begins it's initialization workflow.");
 
     Hooks.on(
         "renderScenesDirectory",
         (app, html, data) => {
-            console.log("Hook on renderScenesDirectory");
+            console.log("TARKANAKNA Hook on renderScenesDirectory");
 
             window.oneJournal.openButton = $(
                 `<button class="one-journal-open">${i18n("OpenButton")}</button>`

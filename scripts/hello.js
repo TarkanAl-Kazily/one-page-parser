@@ -8,6 +8,27 @@ Hooks.on("ready", function() {
   console.log("This code runs once core initialization is ready and game data is available.");
 });
 
-Hooks.on("Create Scene", function() {
-  console.log("Create Scene hook ran WOOTOOOTOTOTO!!!");
-});
+
+Hooks.on(
+"renderScenesDirectory",
+(app: JournalSheet, html: JQuery<HTMLElement>, data) => {
+  if (
+    !window.oneJournal.userPermitted() ||
+    html.closest("#OneJournalDirectory").length != 0
+  ) {
+    return;
+  }
+
+  window.oneJournal.openButton = $(
+    `<button class="one-journal-open">${i18n("OpenButton")}</button>`
+  );
+  window.oneJournal.openButton.click(() => {
+    window.oneJournal.shell.render(true);
+  });
+  html.find(".directory-footer").append(window.oneJournal.openButton);
+
+  window.oneJournal.toggleOpenButton(
+    getSetting(settings.OPEN_BUTTON_IN_DIRECTORY)
+  );
+}
+);

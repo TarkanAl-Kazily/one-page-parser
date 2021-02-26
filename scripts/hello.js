@@ -12,16 +12,21 @@ Hooks.on("ready", function() {
 Hooks.on(
 "renderScenesDirectory",
 (app, html, data) => {
+  console.log("Hook on renderScenesDirectory");
+
   window.oneJournal.openButton = $(
     `<button class="one-journal-open">${i18n("OpenButton")}</button>`
   );
+
   window.oneJournal.openButton.click(() => {
     window.oneJournal.shell.render(true);
   });
+
   html.find(".directory-footer").append(window.oneJournal.openButton);
 
   window.oneJournal.toggleOpenButton(
     getSetting(settings.OPEN_BUTTON_IN_DIRECTORY)
   );
+
 }
 );

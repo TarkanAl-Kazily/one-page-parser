@@ -1,4 +1,4 @@
-import { OnePageParser } from "./scripts/one_page_parser.js" ;
+import { OnePageParser } from "./one_page_parser.js" ;
 
 console.log("Hello World! This code runs immediately when the file is loaded.");
 

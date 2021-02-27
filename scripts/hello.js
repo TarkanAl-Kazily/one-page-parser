@@ -14,10 +14,10 @@ Hooks.once("init", function() {
             console.log("OnePageParser | Hook to modify SceneDirectory");
 
             window.onePageParser.importButton = $(
-                `<button class="one-page-parser-import">Import Button</button>`
+                `<div class="one-page-parser-actions flexrow"><button class="one-page-parser-import">Import Button</button></div>`
             );
 
-            html.find(".directory-header").find("header-actions").after(window.onePageParser.importButton);
+            html.find(".header-actions").after(window.onePageParser.importButton);
 
             window.onePageParser.importButton.css("display", "block");
         }

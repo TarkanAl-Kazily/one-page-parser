@@ -6,6 +6,7 @@
     "version": "0.2.2",
     "minimumCoreVersion": "0.5.0",
     "scripts": [
+        "scripts/one_page_parser.js",
         "scripts/hello.js"
     ],
     "url": "https://github.com/TarkanAl-Kazily/foundryvtt-one-page-parser",

@@ -1,28 +1,25 @@
+import { OnePageParser } from "./scripts/one_page_parser.js" ;
+
 console.log("Hello World! This code runs immediately when the file is loaded.");
-
-class OnePageParser {
-    openButton;
-
-}
 
 Hooks.once("init", function() {
     console.log("This code runs once the Foundry VTT software begins it's initialization workflow.");
 
+    // Setup global One Page Parser
     window.onePageParser = window.onePageParser || new OnePageParser();
 
     Hooks.on(
         "renderSceneDirectory",
         (app, html, data) => {
-            console.log("TARKANAKNA Hook on renderScenesDirectory");
+            console.log("OnePageParser | Hook to modify SceneDirectory");
 
-            window.onePageParser.openButton = $(
-                `<button class="one-journal-open">Parser Button</button>`
+            window.onePageParser.importButton = $(
+                `<button class="one-journal-open">Import Button</button>`
             );
 
-            html.find(".directory-footer").append(window.onePageParser.openButton);
+            html.find(".directory-header").splice(1, 0, window.onePageParser.importButton);
 
-            window.onePageParser.openButton.css("display", "block");
-
+            window.onePageParser.importButton.css("display", "block");
         }
     );
 

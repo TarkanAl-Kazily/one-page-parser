@@ -17,7 +17,7 @@ Hooks.once("init", function() {
                 `<button class="one-page-parser-import">Import Button</button>`
             );
 
-            html.find(".directory-header").find( $("header-actions") ).after(window.onePageParser.importButton);
+            html.find(".directory-header").find("header-actions").after(window.onePageParser.importButton);
 
             window.onePageParser.importButton.css("display", "block");
         }

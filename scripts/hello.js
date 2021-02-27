@@ -21,6 +21,11 @@ Hooks.once("init", function() {
                 </div>`
             );
 
+            window.onePageParser.importButton.click(() => {
+                console.log("OnePageParser | importButton click");
+                window.onePageParser.importButtonClicked();
+            });
+
             html.find(".header-actions").after(window.onePageParser.importButton);
         }
     );

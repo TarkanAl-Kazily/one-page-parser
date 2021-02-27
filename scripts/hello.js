@@ -11,25 +11,17 @@ Hooks.once("init", function() {
     Hooks.on(
         "renderSceneDirectory",
         (app, html, data) => {
-            console.log("OnePageParser | Hook to modify SceneDirectory");
+            console.log("OnePageParser | Hook to add button to SceneDirectory");
 
+            // one-page-parser-actions: My class
+            // action-buttons and flexrow: FoundryVTT class to format like a button
             window.onePageParser.importButton = $(
-                `<div class="one-page-parser-actions flexrow"><button class="one-page-parser-import">Import Button</button></div>`
+                `<div class="one-page-parser-actions action-buttons flexrow">
+                    <button class="one-page-parser-import">Import Button</button>
+                </div>`
             );
 
             html.find(".header-actions").after(window.onePageParser.importButton);
-
-            window.onePageParser.importButton.css("display", "block");
-        }
-    );
-
-    Hooks.on(
-        "renderDialog",
-        (app, html, data) => {
-            console.log("TARKANAKNA Hook on renderDialog");
-            console.log(app);
-            console.log(html);
-            console.log(data);
         }
     );
 });

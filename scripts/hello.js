@@ -17,7 +17,7 @@ Hooks.once("init", function() {
                 `<button class="one-journal-open">Import Button</button>`
             );
 
-            html.find(".directory-header").splice(1, 0, window.onePageParser.importButton);
+            html.find(".directory-header").append(window.onePageParser.importButton);
 
             window.onePageParser.importButton.css("display", "block");
         }

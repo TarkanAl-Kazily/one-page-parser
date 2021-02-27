@@ -12,11 +12,13 @@ Hooks.once("init", function() {
         "renderSceneDirectory",
         (app, html, data) => {
             console.log("OnePageParser | Hook to modify SceneDirectory");
+            console.log(typeof(html))
 
             window.onePageParser.importButton = $(
                 `<button class="one-journal-open">Import Button</button>`
             );
 
+            console.log(typeof(html.find(".directory-header")))
             html.find(".directory-header").append(window.onePageParser.importButton);
 
             window.onePageParser.importButton.css("display", "block");

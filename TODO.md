@@ -1,12 +1,10 @@
 # Stuff to do
 
-NOTE: This commit is when I decide to scrap "Scene creation" and instead just do "Wall importing"
-
-[ ] Modify "Create Scene" initial UI:
+[X] Modify "Create Scene" initial UI:
   [X] Add button next to "Create Scene" that says "Import"
   [X] Button creates a dialog
-  [ ] Import will perform dummy scene creation actions
-  [ ] Import must be one-time action, after which normal scene edit UI should work
+  [X] Import will perform dummy scene creation actions
+  [X] Import must be one-time action, after which normal scene edit UI should work
 
 [X] Button Dialog UI - extends FormApplication (or SceneConfig or BaseEntitySheet)
   [X] Field to give name to scene
@@ -19,13 +17,13 @@ NOTE: This commit is when I decide to scrap "Scene creation" and instead just do
 [ ] Dummy scene creation actions
   [X] Create new scene object
   [X] Define the scene background with a dummy image artifact
-  [ ] Define the scene dimensions according to the image dimensions
+  [X] Define the scene dimensions according to the image dimensions
   [X] Define the grid size based on a constant
   [X] Add a square wall system in the middle of the map
-  [ ] Set the lighting to dynamic
+  [X] Set the lighting to dynamic (default)
   [ ] Set the default camera view to center the map
 
-[ ] Smart scene creation actions
+[X] Smart scene creation actions
   [X] Set scene background to imported PNG
   [X] Set grid size dimension
-  [ ] Create walls from JSON
+  [X] Create walls from JSON

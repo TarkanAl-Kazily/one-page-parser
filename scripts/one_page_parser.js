@@ -4,21 +4,129 @@ export class OnePageParser {
     importButton;
 
     importButtonClicked() {
-        console.log("OnePageParser::importButtonClicked");
+        console.log("OnePageParser | importButtonClicked");
         let form = new OnePageParserForm({});
         form.render(true);
     }
 }
 
+class MatrixMap {
+    // for fast checking
+    matrix;
+    // for fast iterating
+    list;
+
+    constructor() {
+        this.matrix = {};
+        this.list = [];
+    }
+
+    get(x, y) {
+        return this.matrix[x] && this.matrix[x][y];
+    }
+
+    put(x, y) {
+        if (!this.matrix[x]) {
+            this.matrix[x] = {};
+        }
+        this.matrix[x][y] = true;
+        this.list.push([x, y]);
+    }
+
+    addRect(rect) {
+        for (let x = rect.x; x < rect.x + rect.w; x++) {
+            for (let y = rect.y; y < rect.y + rect.h; y++) {
+                this.put(x, y);
+            }
+        }
+    }
+
+    getWalls() {
+        let walls = [];
+        this.list.forEach(p => {
+            let x = p[0];
+            let y = p[1];
+
+            if (!this.get(x, y-1)) {
+                walls.push([x, y, x+1, y]);
+            }
+
+            if (!this.get(x, y+1)) {
+                walls.push([x, y+1, x+1, y+1]);
+            }
+
+            if (!this.get(x-1, y)) {
+                walls.push([x, y, x, y+1]);
+            }
+
+            if (!this.get(x+1, y)) {
+                walls.push([x+1, y, x+1, y+1]);
+            }
+        });
+        return walls;
+    }
+
+    getFilteredWalls() {
+        let walls = this.getWalls();
+        let keys = [[], []];
+        let sorting = [{}, {}];
+        walls.forEach(w => {
+            if (w[1] == w[3]) {
+                if (!sorting[0][w[1]]) {
+                    sorting[0][w[1]] = [];
+                    keys[0].push(w[1]);
+                }
+                sorting[0][w[1]].push(w);
+            } else {
+                if (!sorting[1][w[0]]) {
+                    sorting[1][w[0]] = [];
+                    keys[1].push(w[0]);
+                }
+                sorting[1][w[0]].push(w);
+            }
+        });
+
+        let result = [];
+
+        // Do for both x and y. For y, shift indexing points by 1
+        for (let i = 0; i < 2; i++) {
+            keys[i].forEach(k => {
+                // Sort heap by starting time
+                let heap = sorting[i][k];
+                heap.sort((a, b) => a[i] > b[i] ? 1 : -1);
+                // Add first element to the stack
+                let stack = [];
+                stack.push(heap[0]);
+                heap.forEach(wall => {
+                    if (wall[i] > stack[stack.length - 1][i+2]) {
+                        // new wall starts after current segment ends, so push to stack
+                        stack.push(wall);
+                    } else if (stack[stack.length - 1][i+2] < wall[i+2]) {
+                        // new wall is longer than current segment, so lengthen wall
+                        stack[stack.length - 1][i+2] = wall[i+2];
+                    } else {
+                        // else wall is contained inside current segment
+                    }
+                });
+                stack.forEach(wall => result.push(wall));
+            });
+        }
+
+        return result;
+    }
+
+}
+
 class OnePageParserForm extends FormApplication {
     constructor(options) {
         super(options);
-        console.log("OnePageParser::OnePageParserForm | constructor");
+        console.log("OnePageParser | OnePageParserForm constructor");
     }
 
     // overrides superclass
     static get defaultOptions() {
         const options = super.defaultOptions;
+        options.title = "OnePageParser Import Scene";
         options.template = "modules/foundryvtt-one-page-parser/templates/one-page-parser-form.html";
         options.editable = true;
         options.width = 450;
@@ -88,96 +196,9 @@ class OnePageParserForm extends FormApplication {
         const texture = await loader.loadTexture(formData.img);
 
         let info = await JSON.parse(formData.json);
+        let map = new MatrixMap();
 
-        let list = [];
-
-        let y_walls = [];
-        let x_walls = [];
-
-        let min_x = Number.MAX_SAFE_INTEGER;
-        let min_y = Number.MAX_SAFE_INTEGER;
-
-        info["rects"].forEach((element, index, array) => {
-            const g = formData.grid;
-            // convert rect to a set of walls
-            y_walls.push({c: [element.x * g, element.y * g, element.x * g, element.y * g + element.h * g]});
-            y_walls.push({c: [element.x * g + element.w * g, element.y * g, element.x * g + element.w * g, element.y * g + element.h * g]});
-
-            x_walls.push({c: [element.x * g, element.y * g, element.x * g + element.w * g, element.y * g]});
-            x_walls.push({c: [element.x * g, element.y * g + element.h * g, element.x * g + element.w * g, element.y * g + element.h * g]});
-            min_x = Math.min(min_x, element.x * g, element.x * g + element.w * g);
-            min_y = Math.min(min_y, element.y * g, element.y * g + element.w * g);
-        });
-
-        // Line merge algorithm: https://stackoverflow.com/questions/32585990/algorithm-merge-overlapping-segments
-        // Sort by starting time
-        x_walls.sort((a, b) => a.c[0] > b.c[0] ? 1 : -1);
-        y_walls.sort((a, b) => a.c[1] > b.c[1] ? 1 : -1);
-
-        let x_walls_lists = {};
-        let x_keys = [];
-        x_walls.forEach(element => {
-            if (!x_walls_lists[element.c[1]]) {
-                x_walls_lists[element.c[1]] = [];
-                x_keys.push(element.c[1]);
-            }
-            x_walls_lists[element.c[1]].push(element);
-        });
-        let y_walls_lists = {};
-        let y_keys = [];
-        y_walls.forEach(element => {
-            if (!y_walls_lists[element.c[0]]) {
-                y_walls_lists[element.c[0]] = [];
-                y_keys.push(element.c[0]);
-            }
-            y_walls_lists[element.c[0]].push(element);
-        });
-
-        let x_stack = [];
-        x_keys.forEach(k => {
-            let l = x_walls_lists[k];
-            // Add first element to the stack
-            x_stack.push(l[0]);
-            l.forEach(element => {
-                const x = x_stack[x_stack.length - 1];
-                if (element.c[0] > x.c[2]) {
-                    // if starts after top of stack ends, add to stack
-                    x_stack.push(element);
-                } else if (x.c[2] < element.c[2]) {
-                    // if longer than current element, lengthen current element
-                    x_stack[x_stack.length - 1].c[2] = element.c[2];
-                }
-            })
-        });
-
-        let y_stack = [];
-        // Add first element to the stack
-        y_keys.forEach(k => {
-            let l = y_walls_lists[k];
-            // Add first element to the stack
-            y_stack.push(l[0]);
-            l.forEach(element => {
-                const y = y_stack[y_stack.length - 1];
-                if (element.c[1] > y.c[3]) {
-                    // if starts after top of stack ends, add to stack
-                    y_stack.push(element);
-                } else if (y.c[3] < element.c[3]) {
-                    // if longer than current element, lengthen current element
-                    y_stack[y_stack.length - 1].c[3] = element.c[3];
-                }
-            })
-        });
-
-        // This makes sure all the walls are inside the map (may be off by a grid box still)
-        [x_stack, y_stack].forEach(l => l.forEach((element, index, array) => {
-            list.push({
-                c: [
-                    element.c[0] - min_x,
-                    element.c[1] - min_y,
-                    element.c[2] - min_x, 
-                    element.c[3] - min_y
-                ]});
-        }));
+        info["rects"].forEach(r => map.addRect(r));
 
         try {
             const newScene = await Scene.create({
@@ -190,10 +211,12 @@ class OnePageParserForm extends FormApplication {
                 fogExploration: true,
                 tokenVision: true,
             });
-            newScene.createEmbeddedEntity("Wall", list, {noHook: false});
+            let g = formData.grid;
+            let walls = map.getFilteredWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
+            newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
         } catch (error) {
             ui.notifications.error(error);
-            console.log("Error with Walls.create");
+            console.log("OnePageParser | Error creating scene");
         }
 
     }

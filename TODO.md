@@ -27,3 +27,12 @@
   [X] Set scene background to imported PNG
   [X] Set grid size dimension
   [X] Create walls from JSON
+
+---
+
+Feature improvements:
+
+[ ] Add instructions to the Import form (/u/revgizmo)
+[ ] Offset the walls from the art for some visual padding (/u/revgizmo)
+[ ] Add door support using JSON data
+[ ] Add note support using JSON data

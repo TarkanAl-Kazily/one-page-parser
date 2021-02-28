@@ -63,7 +63,6 @@ class OnePageParserForm extends FormApplication {
                 validData = false;
             } else {
                 await readTextFromFile(fileList[0]).then(json => formData.json = json);
-                console.log(formData.json);
             }
 
             await $.get(formData.img).fail( () => {
@@ -73,7 +72,7 @@ class OnePageParserForm extends FormApplication {
 
             if (validData) {
                 try {
-                    this.createScene(formData);
+                    this.updateScene(formData);
                     ui.notifications.info("Imported Scene");
                     resolve("Imported Scene");
                 } catch (error) {
@@ -86,31 +85,48 @@ class OnePageParserForm extends FormApplication {
         return promiseResult;
     }
 
-    async createScene(formData) {
-        // Save current scene
+    async updateScene(formData) {
         const curScene = canvas.scene;
 
-        canvas.scene = await Scene.create(formData);
-        Wall.create({
-            c: [100, 100, 100, 400],
-            scene: canvas.scene
-        });
-        Wall.create({
-            c: [100, 400, 400, 400],
-            scene: canvas.scene
-        });
-        Wall.create({
-            c: [400, 400, 400, 100],
-            scene: canvas.scene
-        });
-        Wall.create({
-            c: [400, 100, 100, 100],
-            scene: canvas.scene
+        canvas.getLayer("WallsLayer").activate();
+
+        let info = await JSON.parse(formData.json);
+        console.log(info);
+
+        let list = [];
+
+        //list.push({c: [70, 70, 70, 420]});
+        //list.push({c: [70, 70, 420, 70]});
+        //list.push({c: [420, 70, 420, 420]});
+        //list.push({c: [70, 420, 420, 420]});
+        let min_x = Number.MAX_SAFE_INTEGER;
+        let min_y = Number.MAX_SAFE_INTEGER;
+
+        info["rects"].forEach((element, index, array) => {
+            const g = formData.grid;
+            // convert rect to a set of walls
+            console.log(element);
+            list.push({c: [element.x * g, element.y * g, element.x * g + element.w * g, element.y * g]});
+            list.push({c: [element.x * g, element.y * g, element.x * g, element.y * g + element.h * g]});
+            list.push({c: [element.x * g + element.w * g, element.y * g, element.x * g + element.w * g, element.y * g + element.h * g]});
+            list.push({c: [element.x * g, element.y * g + element.h * g, element.x * g + element.w * g, element.y * g + element.h * g]});
+            min_x = Math.min(min_x, element.x * g, element.x * g + element.w * g);
+            min_y = Math.min(min_y, element.y * g, element.y * g + element.w * g);
         });
 
-        // Switch back to cur scene
-        if (curScene) {
-            canvas.scene = curScene;
+        list.forEach((element, index, array) => {
+            const g = formData.grid;
+            list[index].c[0] -= min_x - g;
+            list[index].c[1] -= min_y;
+            list[index].c[2] -= min_x - g;
+            list[index].c[3] -= min_y;
+        });
+
+        try {
+            await Wall.create(list, {});
+        } catch (error) {
+            ui.notifications.error(error);
+            console.log("Error with Walls.create");
         }
     }
 

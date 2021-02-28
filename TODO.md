@@ -7,11 +7,12 @@
   [ ] Import must be one-time action, after which normal scene edit UI should work
 
 [ ] Button Dialog UI - extends FormApplication (or SceneConfig or BaseEntitySheet)
-  [ ] Field to give name to scene
-  [ ] Button to select import PNG
-  [ ] Button to select import JSON
-  [ ] Field to set grid pixel size (default 70)
-  [ ] Button to "Create One Page Dungeon"
+  [X] Field to give name to scene
+  [X] Button to select import PNG
+  [X] Button to select import JSON
+  [X] Field to set grid pixel size
+  [ ] Default grid pixel size 70
+  [X] Button to "Save Changes" ("Create One Page Dungeon")
 
 [ ] Dummy scene creation actions
   [ ] Create new scene object

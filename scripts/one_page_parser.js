@@ -34,8 +34,6 @@ class OnePageParserForm extends FormApplication {
             // Tries to create a new scene from the info in the form.
             // On success, can call 'resolve' with a helpful message.
             // On failure, calls 'reject' with an error message.
-            //console.log(formData);
-            console.log($("#one-page-parser-json"));
 
             // TODO Find right filelist that contains the formData.json-file
             const fileList = $("#one-page-parser-json")[0].files;

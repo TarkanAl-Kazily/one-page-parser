@@ -61,15 +61,15 @@ class OnePageParserForm extends FormApplication {
             if (fileList.length != 1) {
                 ui.notifications.error("Must import a JSON file");
                 validData = false;
+            } else {
+                await readTextFromFile(fileList[0]).then(json => formData.json = json);
+                console.log(formData.json);
             }
 
             await $.get(formData.img).fail( () => {
                 ui.notifications.error("Background Image file not found");
                 validData = false;
             });
-
-            await readTextFromFile(fileList[0]).then(json => formData.json = json);
-            console.log(formData.json);
 
             if (validData) {
                 try {
@@ -86,8 +86,32 @@ class OnePageParserForm extends FormApplication {
         return promiseResult;
     }
 
-    createScene(formData) {
-        const scene = Scene.create(formData);
+    async createScene(formData) {
+        // Save current scene
+        const curScene = canvas.scene;
+
+        canvas.scene = await Scene.create(formData);
+        Wall.create({
+            c: [100, 100, 100, 400],
+            scene: canvas.scene
+        });
+        Wall.create({
+            c: [100, 400, 400, 400],
+            scene: canvas.scene
+        });
+        Wall.create({
+            c: [400, 400, 400, 100],
+            scene: canvas.scene
+        });
+        Wall.create({
+            c: [400, 100, 100, 100],
+            scene: canvas.scene
+        });
+
+        // Switch back to cur scene
+        if (curScene) {
+            canvas.scene = curScene;
+        }
     }
 
 }

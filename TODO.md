@@ -1,5 +1,7 @@
 # Stuff to do
 
+NOTE: This commit is when I decide to scrap "Scene creation" and instead just do "Wall importing"
+
 [ ] Modify "Create Scene" initial UI:
   [X] Add button next to "Create Scene" that says "Import"
   [X] Button creates a dialog
@@ -19,7 +21,7 @@
   [X] Define the scene background with a dummy image artifact
   [ ] Define the scene dimensions according to the image dimensions
   [X] Define the grid size based on a constant
-  [ ] Add a square wall system in the middle of the map
+  [X] Add a square wall system in the middle of the map
   [ ] Set the lighting to dynamic
   [ ] Set the default camera view to center the map
 

@@ -86,26 +86,19 @@ class OnePageParserForm extends FormApplication {
     }
 
     async updateScene(formData) {
-        const curScene = canvas.scene;
-
-        canvas.getLayer("WallsLayer").activate();
+        const loader = new TextureLoader();
+        const texture = await loader.loadTexture(formData.img);
 
         let info = await JSON.parse(formData.json);
-        console.log(info);
 
         let list = [];
 
-        //list.push({c: [70, 70, 70, 420]});
-        //list.push({c: [70, 70, 420, 70]});
-        //list.push({c: [420, 70, 420, 420]});
-        //list.push({c: [70, 420, 420, 420]});
         let min_x = Number.MAX_SAFE_INTEGER;
         let min_y = Number.MAX_SAFE_INTEGER;
 
         info["rects"].forEach((element, index, array) => {
             const g = formData.grid;
             // convert rect to a set of walls
-            console.log(element);
             list.push({c: [element.x * g, element.y * g, element.x * g + element.w * g, element.y * g]});
             list.push({c: [element.x * g, element.y * g, element.x * g, element.y * g + element.h * g]});
             list.push({c: [element.x * g + element.w * g, element.y * g, element.x * g + element.w * g, element.y * g + element.h * g]});
@@ -114,20 +107,31 @@ class OnePageParserForm extends FormApplication {
             min_y = Math.min(min_y, element.y * g, element.y * g + element.w * g);
         });
 
+        // This makes sure all the walls are inside the map (may be off by a grid box still)
         list.forEach((element, index, array) => {
-            const g = formData.grid;
-            list[index].c[0] -= min_x - g;
+            list[index].c[0] -= min_x;
             list[index].c[1] -= min_y;
-            list[index].c[2] -= min_x - g;
+            list[index].c[2] -= min_x;
             list[index].c[3] -= min_y;
         });
 
         try {
-            await Wall.create(list, {});
+            const newScene = await Scene.create({
+                name: formData.name,
+                grid: formData.grid,
+                img: formData.img,
+                height: texture.height,
+                width: texture.width,
+                padding: 0,
+                fogExploration: true,
+                tokenVision: true,
+            });
+            newScene.createEmbeddedEntity("Wall", list, {noHook: false});
         } catch (error) {
             ui.notifications.error(error);
             console.log("Error with Walls.create");
         }
+
     }
 
 }

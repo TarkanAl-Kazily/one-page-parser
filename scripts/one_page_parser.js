@@ -127,7 +127,7 @@ class OnePageParserForm extends FormApplication {
     static get defaultOptions() {
         const options = super.defaultOptions;
         options.title = "OnePageParser Import Scene";
-        options.template = "modules/foundryvtt-one-page-parser/templates/one-page-parser-form.html";
+        options.template = "modules/one-page-parser/templates/one-page-parser-form.html";
         options.editable = true;
         options.width = 450;
         options.height = "auto";

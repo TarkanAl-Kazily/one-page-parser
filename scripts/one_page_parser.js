@@ -14,7 +14,6 @@ class OnePageParserForm extends FormApplication {
     constructor(options) {
         super(options);
         console.log("OnePageParser::OnePageParserForm | constructor");
-        console.log(this);
     }
 
     // overrides superclass
@@ -30,13 +29,18 @@ class OnePageParserForm extends FormApplication {
 
     // must override - abstract function
     _updateObject(event, formData) {
-        const promiseResult = new Promise((resolve, reject) => {
+        const promiseResult = new Promise(async (resolve, reject) => {
             // The parser logic
             // Tries to create a new scene from the info in the form.
             // On success, can call 'resolve' with a helpful message.
             // On failure, calls 'reject' with an error message.
-            console.log(formData);
+            //console.log(formData);
+            console.log($("#one-page-parser-json"));
 
+            // TODO Find right filelist that contains the formData.json-file
+            const fileList = $("#one-page-parser-json")[0].files;
+
+            //console.log($('form[name="one-page-parser-form"]'));
             let validData = true;
 
             if (isNaN(formData.grid)) {
@@ -54,28 +58,30 @@ class OnePageParserForm extends FormApplication {
                 validData = false;
             }
 
-            $.get(formData.img).fail( () => {
+            if (fileList.length != 1) {
+                ui.notifications.error("Must import a JSON file");
+                validData = false;
+            }
+
+            await $.get(formData.img).fail( () => {
                 ui.notifications.error("Background Image file not found");
                 validData = false;
             });
 
-            $.get(formData.json).fail( () => {
-                ui.notifications.error("JSON Import file not found");
-                validData = false;
-            });
+            await readTextFromFile(fileList[0]).then(json => formData.json = json);
+            console.log(formData.json);
 
             if (validData) {
                 try {
                     this.createScene(formData);
+                    ui.notifications.info("Imported Scene");
+                    resolve("Imported Scene");
                 } catch (error) {
                     reject(error);
                 }
             } else {
                 reject("Form data is not valid. See error notifications.");
             }
-
-            ui.notifications.info("Imported Scene");
-            resolve("Imported Scene");
         });
         return promiseResult;
     }

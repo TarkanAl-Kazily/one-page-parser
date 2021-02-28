@@ -1,7 +1,7 @@
-<form>
+<form name="one-page-parser-form">
     <p><b>Hello World!</b></p>
     <div class="form-group">
-        <label for="scene_name">Scene Name:</label><br>
+        <label for="scene_name">Scene Name</label><br>
         <div class="form-fields">
         <input type="text" id="scene_name" name="name"><br>
         </div>
@@ -16,10 +16,9 @@
     </div>
 
     <div class="form-group">
-        <label>JSON Description</label>
+        <label>JSON Import</label>
         <div class="form-fields">
-            {{filePicker target="img" type="imagevideo"}}
-            <input class="image" type="text" name="json" placeholder="{{localize 'File Path'}}"/>
+            <input id="one-page-parser-json" type="file" name="json-file" accept=".json"/>
         </div>
     </div>
 

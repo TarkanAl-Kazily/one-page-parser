@@ -140,9 +140,6 @@ class OnePageParserForm extends FormApplication {
             x_stack.push(l[0]);
             l.forEach(element => {
                 const x = x_stack[x_stack.length - 1];
-                console.log("XXX");
-                console.log(element.c);
-                console.log(x.c);
                 if (element.c[0] > x.c[2]) {
                     // if starts after top of stack ends, add to stack
                     x_stack.push(element);
@@ -161,9 +158,6 @@ class OnePageParserForm extends FormApplication {
             y_stack.push(l[0]);
             l.forEach(element => {
                 const y = y_stack[y_stack.length - 1];
-                console.log("XXX");
-                console.log(element.c);
-                console.log(y.c);
                 if (element.c[1] > y.c[3]) {
                     // if starts after top of stack ends, add to stack
                     y_stack.push(element);

@@ -114,17 +114,11 @@ class MatrixMap {
             });
         }
 
-        // Try to find a reasonable shift for walls
-        let minx = Number.MAX_SAFE_INTEGER;
-        let miny = Number.MAX_SAFE_INTEGER;
-
         // For every wall coordinate, offset it into the open space (away from the filled tiles)
         result.forEach((wall, index, list) => {
             for (let p = 0; p < 2; p++) {
                 let x = wall[2 * p];
                 let y = wall[2 * p + 1];
-                minx = Math.min(minx, x);
-                miny = Math.min(miny, y);
 
                 // get grid:
                 let subgrid = [[false, false], [false, false]];
@@ -160,9 +154,18 @@ class MatrixMap {
             }
         });
 
-        return result.map(w => [w[0] - minx, w[1] - miny, w[2] - minx, w[3] - miny]);
+        return result;
     }
 
+}
+
+// Helper function that converts a JSON door input to a wall (in map grid coordinates)
+function doorToWall(door) {
+    let result = {};
+    result["c"] = [door["x"] - door["dir"]["y"], door["y"] - door["dir"]["x"], door["x"] + door["dir"]["y"], door["y"] + door["dir"]["x"]];
+    result["c"] = result["c"].map(p => p + 0.5);
+    result["door"] =  CONST.WALL_DOOR_TYPES.DOOR;
+    return result;
 }
 
 class OnePageParserForm extends FormApplication {
@@ -257,6 +260,16 @@ class OnePageParserForm extends FormApplication {
             let g = formData.grid;
             let walls = map.getProcessedWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
             newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
+
+            if (formData.debug) {
+                console.log("Debug enabled");
+                let doors = info["doors"].map(d => doorToWall(d))
+                doors = doors.map(d => {
+                    d["c"] = d["c"].map(v => v*g);
+                    return d;
+                });
+                newScene.createEmbeddedEntity("Wall", doors, {noHook: false});
+            }
         } catch (error) {
             ui.notifications.error(error);
             console.log("OnePageParser | Error creating scene");

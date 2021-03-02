@@ -114,11 +114,17 @@ class MatrixMap {
             });
         }
 
+        // Try to find a reasonable shift for walls
+        let minx = Number.MAX_SAFE_INTEGER;
+        let miny = Number.MAX_SAFE_INTEGER;
+
         // For every wall coordinate, offset it into the open space (away from the filled tiles)
         result.forEach((wall, index, list) => {
             for (let p = 0; p < 2; p++) {
                 let x = wall[2 * p];
                 let y = wall[2 * p + 1];
+                minx = Math.min(minx, x);
+                miny = Math.min(miny, y);
 
                 // get grid:
                 let subgrid = [[false, false], [false, false]];
@@ -154,7 +160,7 @@ class MatrixMap {
             }
         });
 
-        return result;
+        return result.map(w => [w[0] - minx, w[1] - miny, w[2] - minx, w[3] - miny]);
     }
 
 }
@@ -201,11 +207,6 @@ class OnePageParserForm extends FormApplication {
                 validData = false;
             }
 
-            if (formData.name == "") {
-                ui.notifications.error("Scene Name must not be empty");
-                validData = false;
-            }
-
             if (fileList.length != 1) {
                 ui.notifications.error("Must import a JSON file");
                 validData = false;
@@ -244,7 +245,7 @@ class OnePageParserForm extends FormApplication {
 
         try {
             const newScene = await Scene.create({
-                name: formData.name,
+                name: formData.name == "" ? info["title"]: formData.name,
                 grid: formData.grid,
                 img: formData.img,
                 height: texture.height,

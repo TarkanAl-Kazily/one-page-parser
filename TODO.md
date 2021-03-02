@@ -33,7 +33,7 @@
 Feature improvements:
 
 [ ] Add instructions to the Import form (/u/revgizmo)
-[ ] Offset the walls from the art for some visual padding (/u/revgizmo)
+[X] Offset the walls from the art for some visual padding (/u/revgizmo)
 [ ] Add door support using JSON data
 [ ] Add note support using JSON data
 [ ] Default scene name from JSON data (/u/revgizmo)

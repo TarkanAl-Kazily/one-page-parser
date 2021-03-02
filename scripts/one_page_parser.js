@@ -1,3 +1,5 @@
+const WALL_OFFSET = 0.25;
+
 // The OnePageParser class
 export class OnePageParser {
     // Button to open UI to import a dungeon
@@ -66,7 +68,7 @@ class MatrixMap {
         return walls;
     }
 
-    getFilteredWalls() {
+    getProcessedWalls() {
         let walls = this.getWalls();
         let keys = [[], []];
         let sorting = [{}, {}];
@@ -111,6 +113,46 @@ class MatrixMap {
                 stack.forEach(wall => result.push(wall));
             });
         }
+
+        // For every wall coordinate, offset it into the open space (away from the filled tiles)
+        result.forEach((wall, index, list) => {
+            for (let p = 0; p < 2; p++) {
+                let x = wall[2 * p];
+                let y = wall[2 * p + 1];
+
+                // get grid:
+                let subgrid = [[false, false], [false, false]];
+                let parity = 0;
+                for (let i = 0; i < 2; i++) {
+                    for (let j = 0; j < 2; j++) {
+                        subgrid[i][j] = this.get(x-1 + i, y-1 + j);
+                        if (subgrid[i][j]) {
+                            parity += 1;
+                        }
+                    }
+                }
+                // if outside corner case, switch to equivalent inside corner case
+                if (parity == 1) {
+                    subgrid = [
+                        [!subgrid[1][1], !subgrid[1][0]],
+                        [!subgrid[0][1], !subgrid[0][0]],
+                    ]
+                }
+
+                // find the inside corner to shift the wall toward
+                let inside_corner = [];
+                for (let i = 0; i < 2; i++) {
+                    for (let j = 0; j < 2; j++) {
+                        if (!subgrid[i][j]) {
+                            inside_corner = [i, j];
+                        }
+                    }
+                }
+
+                result[index][2 * p] = x + (inside_corner[0] == 0 ? -WALL_OFFSET : WALL_OFFSET);
+                result[index][2 * p + 1] = y + (inside_corner[1] == 0 ? -WALL_OFFSET : WALL_OFFSET);
+            }
+        });
 
         return result;
     }
@@ -212,7 +254,7 @@ class OnePageParserForm extends FormApplication {
                 tokenVision: true,
             });
             let g = formData.grid;
-            let walls = map.getFilteredWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
+            let walls = map.getProcessedWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
             newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
         } catch (error) {
             ui.notifications.error(error);

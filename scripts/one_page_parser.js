@@ -164,7 +164,7 @@ const DOOR_TYPE_EMPTY = 0;
 const DOOR_TYPE_SINGLE_DOOR = 1;
 const DOOR_TYPE_OPENING = 2;
 const DOOR_TYPE_STAIRS_ENTRANCE = 3;
-const DOOR_TYPE_UNKNOWN = 4;
+const DOOR_TYPE_BARS = 4;
 const DOOR_TYPE_DOUBLE_DOOR = 5;
 const DOOR_TYPE_SECRET_WALL = 6;
 const DOOR_TYPE_FLUSH_DOOR = 7;
@@ -191,6 +191,13 @@ function doorToWall(door) {
     result["door"] =  CONST.WALL_DOOR_TYPES.DOOR;
     if (door["type"] == DOOR_TYPE_SECRET_WALL) {
         result["door"] =  CONST.WALL_DOOR_TYPES.SECRET;
+    }
+    if (door["type"] == DOOR_TYPE_BARS) {
+        result["sense"] = CONST.WALL_SENSE_TYPES.NONE;
+        result["ds"] = CONST.WALL_DOOR_STATES.LOCKED;
+    }
+    if (door["type"] == DOOR_TYPE_DOUBLE_DOOR) {
+        result["ds"] = CONST.WALL_DOOR_STATES.LOCKED;
     }
     return result;
 }
@@ -287,15 +294,29 @@ class OnePageParserForm extends FormApplication {
             let g = formData.grid;
             let walls = map.getProcessedWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
             newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
+            let doors = info["doors"].map(d => doorToWall(d)).filter(d => d != null);
+            doors = doors.map(d => {
+                d["c"] = d["c"].map(v => v*g);
+                return d;
+            });
+            await newScene.createEmbeddedEntity("Wall", doors, {noHook: false});
+
+            let minvals = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+            newScene.data.walls.forEach(w => {
+                minvals[0] = Math.min(minvals[0], w.c[0], w.c[2]);
+                minvals[1] = Math.min(minvals[1], w.c[1], w.c[3]);
+            });
+
+            newScene.data.walls = newScene.data.walls.map(w => {
+                w.c = [w.c[0] - minvals[0],
+                       w.c[1] - minvals[1],
+                       w.c[2] - minvals[0],
+                       w.c[3] - minvals[1]];
+                return w;
+            });
 
             if (formData.debug) {
                 console.log("Debug enabled");
-                let doors = info["doors"].map(d => doorToWall(d)).filter(d => d != null);
-                doors = doors.map(d => {
-                    d["c"] = d["c"].map(v => v*g);
-                    return d;
-                });
-                await newScene.createEmbeddedEntity("Wall", doors, {noHook: false});
                 await newScene.createEmbeddedEntity("Drawing", info["doors"].map(d => {
                     return {
                         type: CONST.DRAWING_TYPES.RECTANGLE,

@@ -163,21 +163,15 @@ class MatrixMap {
 const DOOR_TYPE_EMPTY = 0;
 const DOOR_TYPE_SINGLE_DOOR = 1;
 const DOOR_TYPE_OPENING = 2;
-const DOOR_TYPE_STAIRS_ENTRANCE = 3;
+const DOOR_TYPE_STAIR_ENTRANCE = 3;
 const DOOR_TYPE_BARS = 4;
 const DOOR_TYPE_DOUBLE_DOOR = 5;
 const DOOR_TYPE_SECRET_WALL = 6;
 const DOOR_TYPE_FLUSH_DOOR = 7;
-const DOOR_TYPE_STAIRS_EXIT = 8;
+const DOOR_TYPE_STAIR_EXIT = 8;
 
 // Helper function that converts a JSON door input to a wall (in map grid coordinates)
 function doorToWall(door) {
-    if (door["type"] == DOOR_TYPE_EMPTY ||
-        door["type"] == DOOR_TYPE_OPENING ||
-        door["type"] == DOOR_TYPE_STAIRS_ENTRANCE ||
-        door["type"] == DOOR_TYPE_STAIRS_EXIT) {
-        return null;
-    }
     let result = {};
     result["c"] = [door["x"] - 0.75 * door["dir"]["y"], door["y"] - 0.75 * door["dir"]["x"], door["x"] + 0.75 * door["dir"]["y"], door["y"] + 0.75 * door["dir"]["x"]];
     result["c"] = result["c"].map(p => p + 0.5);
@@ -198,6 +192,12 @@ function doorToWall(door) {
     }
     if (door["type"] == DOOR_TYPE_DOUBLE_DOOR) {
         result["ds"] = CONST.WALL_DOOR_STATES.LOCKED;
+    }
+    if (door["type"] == DOOR_TYPE_EMPTY ||
+        door["type"] == DOOR_TYPE_OPENING ||
+        door["type"] == DOOR_TYPE_STAIR_ENTRANCE ||
+        door["type"] == DOOR_TYPE_STAIR_EXIT) {
+        result["remove"] = true;
     }
     return result;
 }
@@ -231,7 +231,6 @@ class OnePageParserForm extends FormApplication {
             // TODO Find right filelist that contains the formData.json-file
             const fileList = $("#one-page-parser-json")[0].files;
 
-            //console.log($('form[name="one-page-parser-form"]'));
             let validData = true;
 
             if (isNaN(formData.grid)) {
@@ -293,27 +292,41 @@ class OnePageParserForm extends FormApplication {
             });
             let g = formData.grid;
             let walls = map.getProcessedWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
-            newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
-            let doors = info["doors"].map(d => doorToWall(d)).filter(d => d != null);
+
+            let doors = info["doors"].map(d => doorToWall(d))
+            // doors can spawn on the border of the map, so we need extra logic to find final offsets
+            let mindoorvals = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
             doors = doors.map(d => {
                 d["c"] = d["c"].map(v => v*g);
+                mindoorvals[0] = Math.min(mindoorvals[0], d.c[0], d.c[2]);
+                mindoorvals[1] = Math.min(mindoorvals[1], d.c[1], d.c[3]);
                 return d;
             });
-            await newScene.createEmbeddedEntity("Wall", doors, {noHook: false});
+            // Gets rid of doors that were only needed for final offset calculation
+            doors = doors.filter(d => !d.remove);
+
+            // Creates all the walls
+            walls = walls.concat(doors);
 
             let minvals = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
-            newScene.data.walls.forEach(w => {
+            walls.forEach(w => {
                 minvals[0] = Math.min(minvals[0], w.c[0], w.c[2]);
                 minvals[1] = Math.min(minvals[1], w.c[1], w.c[3]);
             });
 
-            newScene.data.walls = newScene.data.walls.map(w => {
-                w.c = [w.c[0] - minvals[0],
-                       w.c[1] - minvals[1],
-                       w.c[2] - minvals[0],
-                       w.c[3] - minvals[1]];
+            // If a door (usually stairs) spawns on the left or top side of the map, move all the walls
+            let x_offset = (mindoorvals[0] - minvals[0] < 1) ? -0.25 * g : 0.75 * g ;
+            let y_offset = (mindoorvals[1] - minvals[1] < 1) ? -0.25 * g : 0.75 * g ;
+
+            walls = walls.map(w => {
+                w.c = [w.c[0] - minvals[0] + x_offset,
+                       w.c[1] - minvals[1] + y_offset,
+                       w.c[2] - minvals[0] + x_offset,
+                       w.c[3] - minvals[1] + y_offset];
                 return w;
             });
+
+            await newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
 
             if (formData.debug) {
                 console.log("Debug enabled");

@@ -159,12 +159,39 @@ class MatrixMap {
 
 }
 
+// DOOR TYPES
+const DOOR_TYPE_EMPTY = 0;
+const DOOR_TYPE_SINGLE_DOOR = 1;
+const DOOR_TYPE_OPENING = 2;
+const DOOR_TYPE_STAIRS_ENTRANCE = 3;
+const DOOR_TYPE_UNKNOWN = 4;
+const DOOR_TYPE_DOUBLE_DOOR = 5;
+const DOOR_TYPE_SECRET_WALL = 6;
+const DOOR_TYPE_FLUSH_DOOR = 7;
+const DOOR_TYPE_STAIRS_EXIT = 8;
+
 // Helper function that converts a JSON door input to a wall (in map grid coordinates)
 function doorToWall(door) {
+    if (door["type"] == DOOR_TYPE_EMPTY ||
+        door["type"] == DOOR_TYPE_OPENING ||
+        door["type"] == DOOR_TYPE_STAIRS_ENTRANCE ||
+        door["type"] == DOOR_TYPE_STAIRS_EXIT) {
+        return null;
+    }
     let result = {};
-    result["c"] = [door["x"] - door["dir"]["y"], door["y"] - door["dir"]["x"], door["x"] + door["dir"]["y"], door["y"] + door["dir"]["x"]];
+    result["c"] = [door["x"] - 0.75 * door["dir"]["y"], door["y"] - 0.75 * door["dir"]["x"], door["x"] + 0.75 * door["dir"]["y"], door["y"] + 0.75 * door["dir"]["x"]];
     result["c"] = result["c"].map(p => p + 0.5);
+    if (door["type"] == DOOR_TYPE_SECRET_WALL ||
+        door["type"] == DOOR_TYPE_FLUSH_DOOR) {
+        result["c"] = [result["c"][0] - WALL_OFFSET * door["dir"]["x"],
+                       result["c"][1] - WALL_OFFSET * door["dir"]["y"],
+                       result["c"][2] - WALL_OFFSET * door["dir"]["x"],
+                       result["c"][3] - WALL_OFFSET * door["dir"]["y"]];
+    }
     result["door"] =  CONST.WALL_DOOR_TYPES.DOOR;
+    if (door["type"] == DOOR_TYPE_SECRET_WALL) {
+        result["door"] =  CONST.WALL_DOOR_TYPES.SECRET;
+    }
     return result;
 }
 
@@ -263,12 +290,25 @@ class OnePageParserForm extends FormApplication {
 
             if (formData.debug) {
                 console.log("Debug enabled");
-                let doors = info["doors"].map(d => doorToWall(d))
+                let doors = info["doors"].map(d => doorToWall(d)).filter(d => d != null);
                 doors = doors.map(d => {
                     d["c"] = d["c"].map(v => v*g);
                     return d;
                 });
-                newScene.createEmbeddedEntity("Wall", doors, {noHook: false});
+                await newScene.createEmbeddedEntity("Wall", doors, {noHook: false});
+                await newScene.createEmbeddedEntity("Drawing", info["doors"].map(d => {
+                    return {
+                        type: CONST.DRAWING_TYPES.RECTANGLE,
+                        author: game.user._id,
+                        x : (d["x"] + 0.5) * g,
+                        y : (d["y"] + 0.5) * g,
+                        width : g * 1.5,
+                        height : g * 1.5,
+                        text: d["type"],
+                        strokeColor: "#FF0000",
+                        textColor: "#FF0000",
+                    };
+                }), {noHook: false});
             }
         } catch (error) {
             ui.notifications.error(error);

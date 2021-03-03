@@ -293,17 +293,13 @@ class OnePageParserForm extends FormApplication {
             let g = formData.grid;
             let walls = map.getProcessedWalls().map(m => m.map(v => v*g)).map(m => { return {c : m} });
 
-            let doors = info["doors"].map(d => doorToWall(d))
+            // Gets rid of doors that aren't associated with walls
+            let doors = info["doors"].map(d => doorToWall(d)).filter(d => !d.remove);
             // doors can spawn on the border of the map, so we need extra logic to find final offsets
-            let mindoorvals = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
             doors = doors.map(d => {
                 d["c"] = d["c"].map(v => v*g);
-                mindoorvals[0] = Math.min(mindoorvals[0], d.c[0], d.c[2]);
-                mindoorvals[1] = Math.min(mindoorvals[1], d.c[1], d.c[3]);
                 return d;
             });
-            // Gets rid of doors that were only needed for final offset calculation
-            doors = doors.filter(d => !d.remove);
 
             // Creates all the walls
             walls = walls.concat(doors);
@@ -313,10 +309,51 @@ class OnePageParserForm extends FormApplication {
                 minvals[0] = Math.min(minvals[0], w.c[0], w.c[2]);
                 minvals[1] = Math.min(minvals[1], w.c[1], w.c[3]);
             });
+            
+            // Find the effective top left corner coordinate of the map
+            let min_tile = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+            // Find the list of tiles assuming the left and top edges
+            let min_tile_pos = [ [], [] ];
+
+            info["rects"].forEach(r => {
+                if (r.x < min_tile[0]) {
+                    min_tile[0] = Math.min(min_tile[0], r.x);
+                    min_tile_pos[0] = [r.y];
+                } else if (r.x == min_tile[0]) {
+                    min_tile_pos[0].push(r.y);
+                }
+
+                if (r.y < min_tile[1]) {
+                    min_tile[1] = r.y;
+                    min_tile_pos[1] = [r.x];
+                } else if (r.y == min_tile[1]) {
+                    min_tile_pos[1].push(r.x);
+                }
+            });
+
+            let x_edge_has_tile = true;
+            // Check all the rectangles on the left side
+            min_tile_pos[0].forEach(r => {
+                // if is not door, then x_edge_has_tile = false
+                let matches = info["doors"].filter(d => (d.x == min_tile[0] && d.y == r));
+                if (matches.length == 0) {
+                    x_edge_has_tile = false;
+                }
+            });
+
+            let y_edge_has_tile = true;
+            // Check all the rectangles on the top side
+            min_tile_pos[1].forEach(r => {
+                // if is not door, then y_edge_has_tile = false
+                let matches = info["doors"].filter(d => (d.x == r && d.y == min_tile[1]));
+                if (matches.length == 0) {
+                    y_edge_has_tile = false;
+                }
+            });
 
             // If a door (usually stairs) spawns on the left or top side of the map, move all the walls
-            let x_offset = (mindoorvals[0] - minvals[0] < 1) ? -0.25 * g : 0.75 * g ;
-            let y_offset = (mindoorvals[1] - minvals[1] < 1) ? -0.25 * g : 0.75 * g ;
+            let x_offset = (x_edge_has_tile) ? -0.25 * g : 0.75 * g ;
+            let y_offset = (y_edge_has_tile) ? -0.25 * g : 0.75 * g ;
 
             walls = walls.map(w => {
                 w.c = [w.c[0] - minvals[0] + x_offset,

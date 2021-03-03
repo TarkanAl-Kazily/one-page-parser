@@ -37,3 +37,6 @@ Feature improvements:
 [X] Add door support using JSON data
 [ ] Add note support using JSON data
 [X] Default scene name from JSON data (/u/revgizmo)
+[ ] Call out u/baileywiki and the Token Attacher module for extra awesome
+- https://www.reddit.com/r/FoundryVTT/comments/lw872j/foundry_module_highlight_onepage_dungeons_watabou/
+

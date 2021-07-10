@@ -3,8 +3,8 @@
     "title": "One Page Parser",
     "description": "Import instant scenes from One Page Dungeon",
     "author": "Tarkan Al-Kazily",
-    "version": "0.5.0",
-    "minimumCoreVersion": "0.7.0",
+    "version": "0.5.1",
+    "minimumCoreVersion": "0.8.6",
     "compatibleCoreVersion" : "0.8.8",
     "esmodules": [
         "scripts/one_page_parser.js",

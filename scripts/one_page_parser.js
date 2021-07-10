@@ -363,11 +363,11 @@ class OnePageParserForm extends FormApplication {
                 return w;
             });
 
-            await newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
+            await newScene.createEmbeddedDocuments("Wall", walls, {noHook: false});
 
             if (formData.debug) {
                 console.log("Debug enabled");
-                await newScene.createEmbeddedEntity("Drawing", info["doors"].map(d => {
+                await newScene.createEmbeddedDocuments("Drawing", info["doors"].map(d => {
                     return {
                         type: CONST.DRAWING_TYPES.RECTANGLE,
                         author: game.user._id,

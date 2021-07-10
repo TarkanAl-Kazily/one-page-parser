@@ -363,11 +363,27 @@ class OnePageParserForm extends FormApplication {
                 return w;
             });
 
-            await newScene.createEmbeddedEntity("Wall", walls, {noHook: false});
+            await newScene.createEmbeddedDocuments("Wall", walls, {noHook: false});
+
+			// Dynamic Width (Build Regex) - https://stackoverflow.com/a/51506718
+			const wrap = (s, w) => s.replace(
+				new RegExp(`(?![^\\n]{1,${w}}$)([^\\n]{1,${w}})\\s`, 'g'), '$1\n'
+			);
+
+            await newScene.createEmbeddedDocuments("Note", info["notes"].map(d => {
+                const txt = wrap(d["text"], 24);
+                return {
+                    x : d["pos"]["x"] * g - minvals[0] + x_offset,
+                    y : d["pos"]["y"] * g - minvals[1] + y_offset,
+                    text: txt,
+                    iconTint: "#FF0010",
+                    textColor: "#FF0010",
+                };
+            }), {noHook: false});
 
             if (formData.debug) {
                 console.log("Debug enabled");
-                await newScene.createEmbeddedEntity("Drawing", info["doors"].map(d => {
+                await newScene.createEmbeddedDocuments("Drawing", info["doors"].map(d => {
                     return {
                         type: CONST.DRAWING_TYPES.RECTANGLE,
                         author: game.user._id,

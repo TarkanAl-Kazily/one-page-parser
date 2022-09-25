@@ -14,8 +14,7 @@
     ],
     "compatibility": {
         "minimum": "0.8.6",
-        "verified": "10",
-        "maximum": "10"
+        "verified": "10"
     },
     "url": "https://github.com/TarkanAl-Kazily/one-page-parser",
     "manifest": "https://github.com/TarkanAl-Kazily/one-page-parser/releases/latest/download/module.json",

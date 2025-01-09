@@ -5,18 +5,18 @@
     "description": "Import instant scenes from One Page Dungeon",
     "author": "Tarkan Al-Kazily",
     "authors": [ { "name": "Tarkan Al-Kazily"} ],
-    "version": "0.6.0",
+    "version": "0.7.0",
     "minimumCoreVersion": "0.8.6",
-    "compatibleCoreVersion" : "10",
+    "compatibleCoreVersion" : "12",
     "esmodules": [
         "scripts/one_page_parser.js",
         "scripts/hello.js"
     ],
     "compatibility": {
         "minimum": "0.8.6",
-        "verified": "10"
+        "verified": "12"
     },
     "url": "https://github.com/TarkanAl-Kazily/one-page-parser",
-    "manifest": "https://github.com/TarkanAl-Kazily/one-page-parser/releases/download/v0.6.0/module.json",
-    "download": "https://github.com/TarkanAl-Kazily/one-page-parser/archive/refs/tags/v0.6.0.zip"
+    "manifest": "https://github.com/TarkanAl-Kazily/one-page-parser/releases/download/v0.7.0/module.json",
+    "download": "https://github.com/TarkanAl-Kazily/one-page-parser/archive/refs/tags/v0.7.0.zip"
 }

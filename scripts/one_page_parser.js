@@ -282,8 +282,12 @@ class OnePageParserForm extends FormApplication {
         try {
             const newScene = await Scene.create({
                 name: formData.name == "" ? info["title"]: formData.name,
-                grid: formData.grid,
-                img: formData.img,
+                grid: {
+                    size: formData.grid
+                },
+                background: {
+                    src: formData.img
+                },
                 height: texture.height,
                 width: texture.width,
                 padding: 0,

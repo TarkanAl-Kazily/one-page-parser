@@ -1,31 +1,32 @@
 <form name="one-page-parser-form">
-    <p>Import from <a href="https://watabou.itch.io/one-page-dungeon">One Page Dungeon</a> by right-clicking your One Page Dungeon to select "Export PNG" and "Export JSON", and upload the files here.</p>
+    <p>Import from <a href="https://watabou.itch.io/one-page-dungeon">One Page Dungeon</a> by right-clicking your One
+        Page Dungeon to select "Export PNG" and "Export JSON", and upload the files here.</p>
     <div class="form-group">
         <label for="scene_name">Scene Name</label><br>
         <div class="form-fields">
-        <input type="text" id="scene_name" name="name" placeholder="leave blank to import name"><br>
+            <input type="text" id="scene_name" name="name" placeholder="leave blank to import name"><br>
         </div>
     </div>
 
     <div class="form-group">
         <label>Background Image</label>
         <div class="form-fields">
-            {{filePicker target="img" type="imagevideo"}}
-            <input class="image" type="text" name="img" placeholder="{{localize 'File Path'}}"/>
+            <file-picker class="image" type="file" name="img" placeholder="{{localize 'File Path'}}"
+                accept="*"></file-picker>
         </div>
     </div>
 
     <div class="form-group">
         <label>JSON Import</label>
         <div class="form-fields">
-            <input id="one-page-parser-json" type="file" name="json-file" accept=".json"/>
+            <input id="one-page-parser-json" type="file" name="json-file" accept=".json" />
         </div>
     </div>
 
     <div class="form-group">
         <label>{{localize "SCENES.GridSize"}} <span class="units">({{localize "SCENES.Pixels"}})</span></label>
         <div class="form-fields">
-            <input type="text" name="grid" placeholder="{{localize 'SCENES.Pixels'}}" value="70" data-dtype="Number"/>
+            <input type="text" name="grid" placeholder="{{localize 'SCENES.Pixels'}}" value="70" data-dtype="Number" />
         </div>
     </div>
 

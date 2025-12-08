@@ -11,20 +11,18 @@ Hooks.once("init", function() {
         (app, html, data) => {
             console.log("OnePageParser | Hook to add button to SceneDirectory");
 
-            // one-page-parser-actions: My class
-            // action-buttons and flexrow: FoundryVTT class to format like a button
-            window.onePageParser.importButton = $(
+            const importButton =
                 `<div class="one-page-parser-actions action-buttons flexrow">
-                    <button class="one-page-parser-import">OnePageParser Import Scene</button>
-                </div>`
-            );
+                    <button class="one-page-parser-import">OnePageParser</button>
+                </div>`;
 
-            window.onePageParser.importButton.click(() => {
-                console.log("OnePageParser | importButton click");
+            const header = html.querySelector(".header-actions");
+            if (header) {
+                header.insertAdjacentHTML("beforeend", importButton);
+            }
+            html.querySelector(".one-page-parser-import")?.addEventListener("click", async () => {
                 window.onePageParser.importButtonClicked();
             });
-
-            html.find(".header-actions").after(window.onePageParser.importButton);
         }
     );
 });

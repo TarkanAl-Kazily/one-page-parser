@@ -247,7 +247,7 @@ class OnePageParserForm extends FormApplication {
                 ui.notifications.error("Must import a JSON file");
                 validData = false;
             } else {
-                await readTextFromFile(fileList[0]).then(json => formData.json = json);
+                await foundry.utils.readTextFromFile(fileList[0]).then(json => formData.json = json);
             }
 
             await $.get(formData.img).fail( () => {
@@ -271,7 +271,7 @@ class OnePageParserForm extends FormApplication {
     }
 
     async updateScene(formData) {
-        const loader = new TextureLoader();
+        const loader = new foundry.canvas.TextureLoader();
         const texture = await loader.loadTexture(formData.img);
 
         let info = await JSON.parse(formData.json);
